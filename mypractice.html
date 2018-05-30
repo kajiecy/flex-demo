@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction:column;
+        }
+        header{
+            height: 5vh;
+            background-color: cornflowerblue;
+        }
+        footer{
+            height: 5vh;
+            background-color: cornflowerblue;
+        }
+
+
+        .middle{
+            display: flex;
+            flex: 1;
+        }
+        aside{
+            background-color: #FF6060;
+            flex: 1 6 20%;
+        }
+        .content{
+            background-color: aquamarine;
+            flex: 1 1 80%;
+        }
+
+        @media screen and (max-width: 640px){
+            .middle{
+                display: flex;
+                flex-direction:column;
+            }
+            aside{
+                flex: 0 1 5vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>header</header>
+    <div class="middle">
+        <aside>aside</aside>
+        <div class="content">
+            content
+        </div>
+    </div>
+    <footer>footer</footer>
+</body>
+</html>
