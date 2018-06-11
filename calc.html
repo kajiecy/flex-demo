@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div id="app">
+        <div style="display: table;width: 100%">
+            <div style="display: table-cell; width: 35%">
+                <el-form ref="form" :model="form" label-width="180px">
+
+                    <el-form-item label="高：a=">
+                        <el-input v-model="form.a" type="number">
+                            <template slot="append">m</template>
+                        </el-input>
+                    </el-form-item>
+
+                    <el-form-item label="宽：b=">
+                        <el-input v-model="form.b" type="number">
+                            <template slot="append">m</template>
+                        </el-input>
+                    </el-form-item>
+
+                    <el-form-item label="厚：c=">
+                        <el-input v-model="form.c" type="number">
+                            <template slot="append">m</template>
+                        </el-input>
+                    </el-form-item>
+
+                    <el-form-item label="距离：d=">
+                        <el-input v-model="form.d" type="number">
+                            <template slot="append">m</template>
+                        </el-input>
+                    </el-form-item>
+
+                    <el-form-item label="最大速度：vm=">
+                        <el-input v-model="form.vm" type="number">
+                            <template slot="append">m/s</template>
+                        </el-input>
+                    </el-form-item>
+
+
+                    <el-form-item label="雨速：u=">
+                        <el-input v-model="form.u" type="number">
+                            <template slot="append">m/s</template>
+                        </el-input>
+                    </el-form-item>
+
+                    <el-form-item label="降雨量：w=">
+                        <el-input v-model="form.w" type="number">
+                            <template slot="append">cm/h</template>
+                        </el-input>
+                    </el-form-item>
+
+                    <el-form-item label="跑步速度：v=">
+                        <el-input v-model="form.v" type="number">
+                            <template slot="append">未定义</template>
+                        </el-input>
+                    </el-form-item>
+                </el-form>
+                <div style="text-align: right">
+                    <el-button type="primary">计算</el-button>
+                </div>
+            </div>
+            <div style="display: table-cell;padding-left: 20px">
+                <div style="margin: 10px">
+                    Part1
+                    <div style="padding-left: 20px">
+                        <div>
+                            S = {{oneSResult}}
+                        </div>
+                        <div>
+                            所用时间：t = {{oneTResult}}
+                        </div>
+                        <div>
+                            总降雨量Q = {{oneQResult}}
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin: 10px">
+                    Part2
+                    <div style="padding-left: 20px;margin: 20px 0">
+                        θ:0° <br>
+                        Q1 = {{twoQ1Result(0)}}<br>
+                        Q2 = {{twoQ2Result(0)}}<br>
+                        Qmin = {{twoQ1Result(0)+twoQ2Result(0)}}<br>
+                    </div>
+                    <div style="padding-left: 20px;margin: 20px 0">
+                        θ:30°<br>
+                        Q1 = {{twoQ1Result(30)}}<br>
+                        Q2 = {{twoQ2Result(30)}}<br>
+                        Qmin = {{twoQ1Result(30)+twoQ2Result(30)}}<br>
+                    </div>
+                </div>
+
+                <div style="margin: 10px">
+                    Part3
+                    <div style="padding-left: 20px">
+                        θ:30°<br>
+                        <div>
+                           Q1={{twoQ1Result(30)}}
+                        </div>
+                        <div>
+                            v:{{form.v}};<br>
+                            uSinθ:{{uSinVal(30)}}<br>
+                            v<=uSinθ:{{form.v<=uSinVal(30)}}
+                        </div>
+                        <div>
+                            Q2={{thirQ2Result(30)}}
+                        </div>
+                        <div>
+                            Qmin = {{twoQ1Result(30)+thirQ2Result(30)}}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+    var vue = new Vue({
+        el: '#app',
+        data: {
+            form:{
+                a:0,
+                b:0,
+                c:0,
+                d:0,
+                vm:0,
+                u:0,
+                w:0,
+                v:0,
+            }
+        },
+        methods:{
+            twoQ1Result:function (rate) {
+                if(this.form.v==0){
+                    return 0;
+                }
+                var result = this.form.w/360*Math.cos(2*Math.PI/360*rate)*((this.form.b*this.form.c*this.form.d)/this.form.v);
+                return result;
+            },
+            twoQ2Result:function (rate) {
+                if(this.form.v==0){
+                    return 0;
+                }
+                if(this.form.u==0){
+                    return 0;
+                }
+                var formula = (this.form.w*(this.uSinVal(rate)+this.form.v))/this.form.v;
+                var result = 1/360*formula+((this.form.a*this.form.b*this.form.d)/this.form.v)
+                return result;
+            },
+            thirQ2Result:function (rate) {
+                var upVal = Math.abs(this.uSinVal(rate)-this.form.v)*this.form.w*this.form.a*this.form.b*this.form.d
+                var downVal = 360*this.form.u*this.form.v
+                if(downVal==0){
+                    return 0;
+                }
+                return upVal/downVal;
+            },
+            uSinVal:function(rate){
+                return this.form.u*Math.sin(2*Math.PI/360*rate);
+            }
+        },
+        computed:{
+            oneSResult:function(){
+                return 2*this.form.a*this.form.b+2*this.form.a*this.form.c+this.form.b*this.form.c;
+            },
+            oneTResult:function(){
+                if(this.form.vm==0){
+                    return 0
+                }
+                return this.form.d/this.form.vm;
+            },
+            oneQResult:function(){
+                return this.form.w/360*this.oneSResult*this.oneTResult;
+            },
+
+        }
+    });
+
+</script>
+</body>
+</html>
